@@ -1,0 +1,16 @@
+import react from "@vitejs/plugin-react";
+import path from "node:path";
+import { defineConfig } from "vite";
+// https://vite.dev/config/
+export default defineConfig({
+    plugins: [react()],
+    resolve: {
+        alias: {
+            "@": path.resolve(__dirname, "./src"),
+        },
+    },
+    base: "./", // Relative path untuk Capacitor (assets di-load dari file://)
+    server: {
+        host: true, // Memastikan bisa diakses dari IP lokal (192.168.137.1)
+    },
+});

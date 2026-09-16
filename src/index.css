@@ -1,0 +1,52 @@
+@import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600;700&display=swap");
+
+@theme {
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", monospace;
+
+  --color-ground: #e8e5df;
+  --color-panel: #ffffff;
+  --color-plate: #f2f0ea;
+  --color-ink: #17150f;
+  --color-ink-2: #6b6459;
+  --color-rule: #cfc9bd;
+  --color-honda: oklch(0.5479 0.2476 29.2339);
+  --color-selesai: #1b7f3b;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overscroll-behavior: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background: var(--color-ink);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+}
+
+#root {
+  box-sizing: border-box;
+  height: 100dvh;
+  width: 100vw;
+  overflow: hidden;
+  background: var(--color-ground);
+  padding-top: env(safe-area-inset-top);
+  padding-right: env(safe-area-inset-right);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
