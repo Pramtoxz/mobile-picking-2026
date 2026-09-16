@@ -183,44 +183,54 @@ export default function WorkItem() {
                 <section className="flex min-w-0 flex-1 flex-col">
                     <LayarIsi className="p-3">{partTerpilih && <PanelPart part={partTerpilih} />}</LayarIsi>
 
-                    <LayarAksi className="space-y-2">
+                    <LayarAksi className="space-y-1.5 p-2 bg-panel border-t-2 border-ink">
                         {error && (
-                            <p className="flex items-start gap-2 border-l-4 border-honda bg-honda/8 px-3 py-2 text-sm text-honda">
+                            <p className="flex items-start gap-2 border-l-4 border-honda bg-honda/8 px-2.5 py-1.5 text-xs text-honda font-medium">
                                 <AlertTriangle className="mt-0.5 size-4 shrink-0" />
                                 {error}
                             </p>
                         )}
 
                         {partTerkunci ? (
-                            <Button size="xl" variant="garis" className="w-full" disabled>
-                                <Lock className="size-5" />
-                                Final Check
+                            <Button size="lg" variant="garis" className="w-full h-12 border-2 border-rule text-ink-2 font-mono font-bold bg-plate/40 cursor-not-allowed" disabled>
+                                <Lock className="size-4" />
+                                Final Check (Terkunci)
                             </Button>
                         ) : partSelesai ? (
                             <div className="flex gap-2">
-                                <Button size="xl" variant="garis" className="flex-1" disabled>
-                                    <Check className="size-6" strokeWidth={3} />
+                                <Button size="lg" variant="garis" className="flex-1 h-12 border-2 border-selesai text-selesai font-mono font-bold bg-selesai/10 cursor-default" disabled>
+                                    <Check className="size-5 text-selesai" strokeWidth={3} />
                                     Sudah Diambil
                                 </Button>
                                 <Button
-                                    size="xl"
+                                    size="lg"
                                     variant="senyap"
-                                    className="shrink-0 border-2 border-rule"
+                                    className="shrink-0 h-12 border-2 border-rule font-mono font-bold hover:bg-plate active:bg-ink active:text-white"
                                     disabled={memproses}
                                     onClick={() => setKonfirmasiUndo(true)}
                                 >
-                                    {memproses ? <Loader2 className="size-6 animate-spin" /> : <RotateCcw />}
+                                    {memproses ? <Loader2 className="size-5 animate-spin" /> : <RotateCcw className="size-4" />}
                                     Undo
                                 </Button>
                             </div>
                         ) : (
                             <Button
-                                size="xl"
-                                className="w-full"
+                                size="lg"
+                                className="w-full h-12 bg-honda text-white font-mono font-bold text-base tracking-wider hover:bg-honda/90 active:bg-honda/80 border-2 border-ink rounded-sm shadow-sm flex items-center justify-center gap-2"
                                 disabled={memproses}
                                 onClick={() => ubahStatus('done')}
                             >
-                                {memproses ? <Loader2 className="size-6 animate-spin" /> : 'Ambil'}
+                                {memproses ? (
+                                    <>
+                                        <Loader2 className="size-5 animate-spin" />
+                                        Memproses...
+                                    </>
+                                ) : (
+                                    <>
+                                        <Check className="size-5" strokeWidth={3} />
+                                        Ambil Dari Rak
+                                    </>
+                                )}
                             </Button>
                         )}
                     </LayarAksi>

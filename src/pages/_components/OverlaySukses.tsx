@@ -21,20 +21,33 @@ export default function OverlaySukses({ pesan, onSelesai }: OverlaySuksesProps) 
     }, [onSelesai]);
 
     return (
-        <div role="status" className="fixed inset-0 z-60 flex flex-col bg-panel">
-            <AnimasiLottie
-                nama="sukses"
-                loop={false}
-                onSelesai={onSelesai}
-                className="min-h-0 w-full flex-1"
-                gantiDiam={
-                    <span className="flex h-full w-full items-center justify-center">
-                        <Check className="size-24 text-selesai" strokeWidth={3} />
-                    </span>
-                }
-            />
+        <div
+            role="status"
+            className="fixed inset-0 z-60 flex flex-col items-center justify-center bg-panel/95 backdrop-blur-xs px-4 select-none"
+        >
+            <div className="flex flex-col items-center justify-center text-center max-w-sm">
+                {/* Lottie ukuran proporsional untuk landscape (112-128px) */}
+                <div className="h-28 w-28 sm:h-32 sm:w-32 shrink-0 flex items-center justify-center">
+                    <AnimasiLottie
+                        nama="sukses"
+                        loop={false}
+                        onSelesai={onSelesai}
+                        className="h-full w-full object-contain"
+                        gantiDiam={
+                            <span className="flex h-full w-full items-center justify-center">
+                                <Check className="size-20 text-selesai" strokeWidth={3} />
+                            </span>
+                        }
+                    />
+                </div>
 
-            <p className="shrink-0 px-4 pb-6 text-center text-lg font-semibold text-ink">{pesan}</p>
+                <p className="mt-2 font-mono text-base sm:text-lg font-bold text-ink tracking-wide">
+                    {pesan}
+                </p>
+                <p className="mt-0.5 font-mono text-xs text-selesai font-semibold uppercase tracking-wider">
+                    ✓ Kartu Stok Tersimpan
+                </p>
+            </div>
         </div>
     );
 }

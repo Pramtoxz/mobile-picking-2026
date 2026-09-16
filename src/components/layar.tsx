@@ -23,8 +23,9 @@ export const LayarAksi = ({ className, ...props }: React.HTMLAttributes<HTMLDivE
 export const TombolKepala = ({ className, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement>) => (
     <button
         className={cn(
-            'flex h-8 shrink-0 items-center gap-1.5 px-2 text-sm font-medium text-ink-2',
-            'transition-colors hover:text-ink focus-visible:ring-2 focus-visible:ring-honda focus-visible:outline-none',
+            'flex h-9 w-9 shrink-0 items-center justify-center rounded-sm border border-rule/80 bg-plate/60 text-ink-2',
+            'transition-all hover:border-rule hover:bg-plate hover:text-ink active:scale-95 active:bg-ground',
+            'focus-visible:ring-2 focus-visible:ring-honda focus-visible:outline-none',
             'disabled:opacity-40 [&_svg]:size-4 [&_svg]:shrink-0',
             className,
         )}

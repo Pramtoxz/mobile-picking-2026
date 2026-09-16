@@ -1,20 +1,27 @@
 import { tanggalIndo } from '@/lib/format';
 import type { BarisPart } from '@/types';
 
-const Butir = ({ label, nilai }: { label: string; nilai: string }) => (
-    <span className="flex min-w-0 items-baseline gap-1.5">
-        <span className="shrink-0 font-mono text-[10px] tracking-wider text-ink-2 uppercase">{label}</span>
-        <span className="truncate text-[11px] font-semibold text-ink">{nilai}</span>
+const ItemInfo = ({ label, nilai }: { label: string; nilai: string }) => (
+    <span className="flex items-center gap-1 text-[10px] font-mono">
+        <span className="text-ink-2 tracking-wider uppercase">{label}:</span>
+        <span className="font-bold text-ink truncate">{nilai}</span>
     </span>
 );
 
 export default function InfoDo({ part }: { part: BarisPart }) {
     return (
-        <div className="flex shrink-0 flex-wrap items-baseline gap-x-4 gap-y-0.5 border-b border-rule bg-plate px-3 py-1.5">
-            <Butir label="Area" nilai={part.area || '-'} />
-            <Butir label="Channel" nilai={part.nama_channel || '-'} />
-            <Butir label="Dealer" nilai={part.fk_dealer || '-'} />
-            <Butir label="Tgl DO" nilai={tanggalIndo(part.tgl_picking_list_part)} />
+        <div className="flex shrink-0 items-center justify-between gap-x-3 border-b border-rule bg-plate/60 px-3 py-1 select-none overflow-x-auto">
+            <div className="flex items-center gap-x-4 shrink-0">
+                <ItemInfo label="Area" nilai={part.area || '-'} />
+                <span className="text-rule">•</span>
+                <ItemInfo label="Channel" nilai={part.nama_channel || '-'} />
+                <span className="text-rule">•</span>
+                <ItemInfo label="Dealer" nilai={part.fk_dealer || '-'} />
+            </div>
+
+            <div className="shrink-0">
+                <ItemInfo label="Tgl DO" nilai={tanggalIndo(part.tgl_picking_list_part)} />
+            </div>
         </div>
     );
 }

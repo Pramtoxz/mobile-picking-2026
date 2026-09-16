@@ -9,32 +9,36 @@ export default function LayarBoot({
   keterangan = "DIVISION H3 - PART WAREHOUSE",
 }: LayarBootProps) {
   return (
-    <div className="fixed inset-0 flex flex-col items-center justify-center bg-ground px-6 select-none">
-      <div className="flex w-full max-w-sm sm:max-w-md flex-col items-center gap-6">
-        {/* Branding & Status Info */}
-        <div className="flex flex-col items-center gap-3 text-center">
+    <div className="fixed inset-0 flex items-center justify-center bg-ground p-4 select-none">
+      <div className="flex w-full max-w-lg items-center justify-between gap-6 border-2 border-ink bg-panel p-5 rounded-sm shadow-md">
+        {/* Kolom Kiri: Branding & Indikator Status */}
+        <div className="flex flex-col items-start gap-2.5 min-w-0 flex-1">
           <img
             src={logoMenara}
             alt="Menara Agung"
-            className="h-12 w-auto max-w-[220px] object-contain sm:h-14 sm:max-w-[260px]"
+            className="h-9 w-auto max-w-[180px] object-contain"
           />
 
-          <div className="flex flex-col items-center gap-2">
-            <p className="text-sm font-medium tracking-normal text-slate-600 sm:text-base">
+          <div className="space-y-1">
+            <p className="font-mono text-xs font-bold tracking-wider text-ink uppercase">
               {keterangan}
             </p>
+            <p className="font-mono text-[10px] text-ink-2">
+              Terminal Operasional Lapangan
+            </p>
+          </div>
 
-            {/* Subtle Progress / Activity Bar */}
-            <div className="h-1 w-24 overflow-hidden rounded-full bg-ground-2">
-              <div className="h-full w-full origin-left animate-indeterminate rounded-full bg-primary/60" />
-            </div>
+          {/* Indikator Garis Loading Mekanis */}
+          <div className="h-1.5 w-32 overflow-hidden rounded-full bg-rule">
+            <div className="h-full w-full origin-left animate-indeterminate rounded-full bg-honda" />
           </div>
         </div>
-        {/* Area Animasi Utama */}
-        <div className="relative aspect-[4/3] w-full flex items-center justify-center">
+
+        {/* Kolom Kanan: Animasi Lottie Truk (Proporsional Landscape: 110px tinggi) */}
+        <div className="h-28 w-44 shrink-0 flex items-center justify-center overflow-hidden">
           <AnimasiLottie
             nama="truk"
-            className="h-full w-full object-contain pointer-events-none drop-shadow-sm"
+            className="h-full w-full object-contain pointer-events-none"
           />
         </div>
       </div>
