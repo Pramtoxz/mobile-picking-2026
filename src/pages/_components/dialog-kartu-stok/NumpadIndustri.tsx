@@ -1,4 +1,6 @@
-import { Button } from '@/components/ui/button';
+import { TombolMesin } from '@/components/tombol-mesin';
+import { sensory } from '@/lib/sensory';
+import { motion } from 'motion/react';
 import { Delete, Loader2, Send } from 'lucide-react';
 import { useEffect } from 'react';
 
@@ -23,19 +25,34 @@ export default function NumpadIndustri({
     canSubmit = false,
     submitting = false,
 }: NumpadIndustriProps) {
+    const handleDigit = (digit: string) => {
+        sensory.tap();
+        onDigit(digit);
+    };
+
+    const handleBackspace = () => {
+        sensory.tap();
+        onBackspace();
+    };
+
+    const handleClear = () => {
+        sensory.tap();
+        onClear();
+    };
+
     useEffect(() => {
         const tanganiKeydown = (e: KeyboardEvent) => {
             if (disabled || submitting) return;
 
             if (e.key >= '0' && e.key <= '9') {
                 e.preventDefault();
-                onDigit(e.key);
+                handleDigit(e.key);
             } else if (e.key === 'Backspace') {
                 e.preventDefault();
-                onBackspace();
+                handleBackspace();
             } else if (e.key === 'Escape' || e.key.toLowerCase() === 'c') {
                 e.preventDefault();
-                onClear();
+                handleClear();
             } else if (e.key === 'Enter') {
                 e.preventDefault();
                 if (canSubmit) onSubmit();
@@ -46,72 +63,79 @@ export default function NumpadIndustri({
         return () => window.removeEventListener('keydown', tanganiKeydown);
     }, [disabled, submitting, canSubmit, onDigit, onBackspace, onClear, onSubmit]);
 
+    const kelasKeycap =
+        'relative flex h-11 sm:h-12 items-center justify-center rounded-xs border-2 border-ink bg-panel font-mono text-xl sm:text-2xl font-black text-ink shadow-[0_3px_0_0_#17150f] active:shadow-none active:translate-y-[2px] transition-all select-none cursor-pointer disabled:opacity-40 disabled:pointer-events-none';
+
     return (
-        <div className="flex flex-col gap-1.5 p-2 bg-plate/50 border border-rule rounded-sm select-none">
-            <div className="grid grid-cols-3 gap-1.5">
+        <div className="flex flex-col gap-2 p-2.5 bg-plate border-2 border-ink rounded-xs shadow-[2px_2px_0_0_#17150f] select-none">
+            <div className="grid grid-cols-3 gap-2">
                 {TOMBOL_ANGKA.map((angka) => (
-                    <button
+                    <motion.button
                         key={angka}
                         type="button"
                         disabled={disabled || submitting}
-                        onClick={() => onDigit(angka)}
-                        className="h-10 sm:h-11 rounded-sm border-2 border-rule bg-panel font-mono text-lg font-bold text-ink shadow-xs transition-colors hover:bg-plate active:bg-ink active:text-white disabled:opacity-40"
+                        onClick={() => handleDigit(angka)}
+                        whileTap={{ y: 2 }}
+                        className={kelasKeycap}
                         aria-label={`Angka ${angka}`}
                     >
                         {angka}
-                    </button>
+                    </motion.button>
                 ))}
 
-                <button
+                <motion.button
                     type="button"
                     disabled={disabled || submitting}
-                    onClick={onClear}
-                    className="h-10 sm:h-11 rounded-sm border-2 border-rule bg-panel font-mono text-xs font-bold tracking-wider text-ink-2 shadow-xs transition-colors hover:bg-plate active:bg-ink active:text-white disabled:opacity-40"
+                    onClick={handleClear}
+                    whileTap={{ y: 2 }}
+                    className="relative flex h-11 sm:h-12 items-center justify-center rounded-xs border-2 border-ink bg-plate/80 font-mono text-xs font-black tracking-widest text-ink shadow-[0_3px_0_0_#17150f] active:shadow-none active:translate-y-[2px] transition-all select-none cursor-pointer disabled:opacity-40"
                     aria-label="Bersihkan input"
                 >
                     CLR
-                </button>
+                </motion.button>
 
-                <button
+                <motion.button
                     type="button"
                     disabled={disabled || submitting}
-                    onClick={() => onDigit('0')}
-                    className="h-10 sm:h-11 rounded-sm border-2 border-rule bg-panel font-mono text-lg font-bold text-ink shadow-xs transition-colors hover:bg-plate active:bg-ink active:text-white disabled:opacity-40"
+                    onClick={() => handleDigit('0')}
+                    whileTap={{ y: 2 }}
+                    className={kelasKeycap}
                     aria-label="Angka 0"
                 >
                     0
-                </button>
+                </motion.button>
 
-                <button
+                <motion.button
                     type="button"
                     disabled={disabled || submitting}
-                    onClick={onBackspace}
-                    className="flex h-10 sm:h-11 items-center justify-center rounded-sm border-2 border-rule bg-panel text-ink shadow-xs transition-colors hover:bg-plate active:bg-ink active:text-white disabled:opacity-40"
+                    onClick={handleBackspace}
+                    whileTap={{ y: 2 }}
+                    className="relative flex h-11 sm:h-12 items-center justify-center rounded-xs border-2 border-ink bg-plate/80 text-ink shadow-[0_3px_0_0_#17150f] active:shadow-none active:translate-y-[2px] transition-all select-none cursor-pointer disabled:opacity-40"
                     aria-label="Hapus satu digit"
                 >
                     <Delete className="size-5" />
-                </button>
+                </motion.button>
             </div>
 
-            <Button
-                type="button"
-                size="lg"
+            <TombolMesin
+                varian="honda"
+                ukuran="lg"
                 disabled={disabled || submitting || !canSubmit}
                 onClick={onSubmit}
-                className="mt-0.5 h-11 w-full bg-honda text-white font-mono text-sm font-bold tracking-wider hover:bg-honda/90 active:bg-honda/80 border-2 border-ink rounded-sm"
+                className="w-full tracking-widest font-black"
             >
                 {submitting ? (
                     <>
                         <Loader2 className="size-4 animate-spin" />
-                        Menyimpan
+                        MENYIMPAN...
                     </>
                 ) : (
                     <>
                         <Send className="size-4" />
-                        Simpan Kartu Stok
+                        SIMPAN KARTU STOK
                     </>
                 )}
-            </Button>
+            </TombolMesin>
         </div>
     );
 }

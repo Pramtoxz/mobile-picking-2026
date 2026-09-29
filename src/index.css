@@ -28,6 +28,12 @@ body {
   background: var(--color-ink);
   color: var(--color-ink);
   font-family: var(--font-sans);
+  font-feature-settings: "tnum" on;
+}
+
+code, kbd, samp, pre, .font-mono {
+  font-family: var(--font-mono);
+  font-feature-settings: "tnum" on, "zero" on;
 }
 
 #root {

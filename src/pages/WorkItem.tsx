@@ -2,8 +2,10 @@ import { DialogKonfirmasi } from '@/components/dialog-konfirmasi';
 import { Layar, LayarAksi, LayarIsi, LayarKepala, TombolKepala } from '@/components/layar';
 import LayarBoot from '@/components/layar-boot';
 import { PlatRak } from '@/components/plat-rak';
+import { TombolMesin } from '@/components/tombol-mesin';
 import { Button } from '@/components/ui/button';
 import api from '@/lib/api';
+import { sensory } from '@/lib/sensory';
 import type { BarisPart, ItemKartuStok } from '@/types';
 import axios from 'axios';
 import { AlertTriangle, ArrowLeft, Check, Loader2, Lock, RotateCcw } from 'lucide-react';
@@ -34,34 +36,34 @@ export default function WorkItem() {
     const partTerpilih = parts.find((p) => p.id === idTerpilih) ?? null;
 
     const muatParts = useCallback(async () => {
+        if (!fkDo) return;
+
         try {
             const response = await api.get(`/lapangan/do/${fkDo}/parts`);
             const data: BarisPart[] = response.data.data ?? [];
-
             setParts(data);
-            setBundling(Boolean(response.data.is_bundling));
-            setIdTerpilih((sekarang) => {
-                if (sekarang !== null && data.some((p) => p.id === sekarang)) {
-                    return sekarang;
-                }
-                return data.find((p) => p.status_picking_list === 'waiting')?.id ?? data[0]?.id ?? null;
+            setBundling(response.data.is_bundling ?? false);
+
+            setIdTerpilih((prev) => {
+                if (prev && data.some((p) => p.id === prev)) return prev;
+                const pertamaWaiting = data.find((p) => p.status_picking_list === 'waiting');
+                return pertamaWaiting?.id ?? data[0]?.id ?? null;
             });
         } catch (err: unknown) {
-            console.error('Load error:', err);
+            console.error('Load parts error:', err);
             if (axios.isAxiosError(err) && err.response?.status === 401) {
                 navigate('/login', { replace: true });
                 return;
             }
-            setError('Gagal memuat data part.');
+            setError('Gagal memuat part.');
         } finally {
             setLoading(false);
         }
     }, [fkDo, navigate]);
 
     useEffect(() => {
-        if (!fkDo) return;
         muatParts();
-    }, [fkDo, muatParts]);
+    }, [muatParts]);
 
     const ubahStatus = async (status: 'done' | 'waiting') => {
         if (!partTerpilih || memproses) return;
@@ -76,7 +78,9 @@ export default function WorkItem() {
             });
 
             if (!response.data.success) {
-                throw new Error(response.data.message || 'Gagal memperbarui status.');
+                sensory.peringatan();
+                setError(response.data.message ?? 'Gagal menyimpan status.');
+                return;
             }
 
             const daftarKartu: ItemKartuStok[] = response.data.kartustok_list ?? [];
@@ -85,9 +89,11 @@ export default function WorkItem() {
                 setPeringatanKartu(null);
                 setItemKartuStok(daftarKartu);
             } else {
+                sensory.sukses();
                 await muatParts();
             }
         } catch (err: unknown) {
+            sensory.peringatan();
             console.error('Update status error:', err);
             if (axios.isAxiosError(err)) {
                 setError(err.response?.data?.message ?? 'Gagal menyimpan perubahan.');
@@ -107,10 +113,12 @@ export default function WorkItem() {
 
         try {
             await api.post('/lapangan/kartustok', { items });
+            sensory.sukses();
             setItemKartuStok([]);
             setSuksesTampil(true);
             await muatParts();
         } catch (err: unknown) {
+            sensory.peringatan();
             console.error('Simpan kartu stok error:', err);
             if (axios.isAxiosError(err)) {
                 setPeringatanKartu(
@@ -192,46 +200,47 @@ export default function WorkItem() {
                         )}
 
                         {partTerkunci ? (
-                            <Button size="lg" variant="garis" className="w-full h-12 border-2 border-rule text-ink-2 font-mono font-bold bg-plate/40 cursor-not-allowed" disabled>
+                            <div className="flex h-12 w-full items-center justify-center gap-2 border-2 border-rule bg-plate/60 text-ink-2 font-mono font-bold text-xs rounded-xs">
                                 <Lock className="size-4" />
-                                Final Check (Terkunci)
-                            </Button>
+                                FINAL CHECK (TERKUNCI)
+                            </div>
                         ) : partSelesai ? (
                             <div className="flex gap-2">
-                                <Button size="lg" variant="garis" className="flex-1 h-12 border-2 border-selesai text-selesai font-mono font-bold bg-selesai/10 cursor-default" disabled>
+                                <div className="flex h-12 flex-1 items-center justify-center gap-2 border-2 border-selesai bg-selesai/15 text-selesai font-mono font-bold text-xs rounded-xs">
                                     <Check className="size-5 text-selesai" strokeWidth={3} />
-                                    Sudah Diambil
-                                </Button>
-                                <Button
-                                    size="lg"
-                                    variant="senyap"
-                                    className="shrink-0 h-12 border-2 border-rule font-mono font-bold hover:bg-plate active:bg-ink active:text-white"
+                                    SUDAH DIAMBIL DARI RAK
+                                </div>
+                                <TombolMesin
+                                    varian="outline"
+                                    ukuran="lg"
+                                    className="shrink-0"
                                     disabled={memproses}
                                     onClick={() => setKonfirmasiUndo(true)}
                                 >
-                                    {memproses ? <Loader2 className="size-5 animate-spin" /> : <RotateCcw className="size-4" />}
-                                    Undo
-                                </Button>
+                                    {memproses ? <Loader2 className="size-4 animate-spin" /> : <RotateCcw className="size-4" />}
+                                    UNDO
+                                </TombolMesin>
                             </div>
                         ) : (
-                            <Button
-                                size="lg"
-                                className="w-full h-12 bg-honda text-white font-mono font-bold text-base tracking-wider hover:bg-honda/90 active:bg-honda/80 border-2 border-ink rounded-sm shadow-sm flex items-center justify-center gap-2"
+                            <TombolMesin
+                                varian="honda"
+                                ukuran="lg"
+                                className="w-full text-sm sm:text-base font-black tracking-widest"
                                 disabled={memproses}
                                 onClick={() => ubahStatus('done')}
                             >
                                 {memproses ? (
                                     <>
                                         <Loader2 className="size-5 animate-spin" />
-                                        Memproses...
+                                        MEMPROSES...
                                     </>
                                 ) : (
                                     <>
                                         <Check className="size-5" strokeWidth={3} />
-                                        Ambil Dari Rak
+                                        AMBIL DARI RAK (SELESAI)
                                     </>
                                 )}
-                            </Button>
+                            </TombolMesin>
                         )}
                     </LayarAksi>
                 </section>

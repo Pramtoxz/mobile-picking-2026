@@ -1,7 +1,9 @@
+import { LampuPilot } from '@/components/lampu-pilot';
 import { Layar, LayarIsi, LayarKepala, TombolKepala } from '@/components/layar';
 import LayarBoot from '@/components/layar-boot';
 import api from '@/lib/api';
 import { perluLayarBoot, tandaiSudahBoot } from '@/lib/boot';
+import { sensory } from '@/lib/sensory';
 import { authService } from '@/services/auth';
 import { useAuthStore } from '@/store/auth';
 import { saringKosong, type BarisDo, type MetaPaginasi, type SaringDo } from '@/types';
@@ -14,13 +16,13 @@ import PenyaringDo from './_components/PenyaringDo';
 
 function BarisKerangka() {
     return (
-        <li className="flex items-center gap-2 px-3 py-2">
-            <div className="h-3 w-7 shrink-0 animate-pulse bg-rule" />
+        <li className="flex items-center gap-2 px-3 py-2.5">
+            <div className="h-3.5 w-7 shrink-0 animate-pulse bg-rule rounded-2xs" />
             <div className="min-w-0 flex-1 space-y-1.5">
-                <div className="h-3.5 w-44 animate-pulse bg-rule" />
-                <div className="h-2.5 w-56 animate-pulse bg-rule" />
+                <div className="h-4 w-44 animate-pulse bg-rule rounded-2xs" />
+                <div className="h-3 w-56 animate-pulse bg-rule rounded-2xs" />
             </div>
-            <div className="h-3.5 w-10 shrink-0 animate-pulse bg-rule" />
+            <div className="h-4 w-12 shrink-0 animate-pulse bg-rule rounded-2xs" />
         </li>
     );
 }
@@ -115,6 +117,7 @@ export default function DoList() {
     }, [muatLanjutan]);
 
     const keluar = async () => {
+        sensory.tap();
         await authService.logout();
         navigate('/login', { replace: true });
     };
@@ -129,21 +132,36 @@ export default function DoList() {
     return (
         <Layar>
             <LayarKepala>
-                <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm leading-tight font-semibold text-ink">{user?.nama ?? 'Operator'}</p>
-                    <p className="truncate font-mono text-[11px] leading-tight text-ink-2">
-                        {user?.adalah_admin_area ? 'SEMUA AREA' : (user?.area_operator ?? '-')}
-                    </p>
+                <div className="min-w-0 flex-1 flex items-center gap-2.5">
+                    <LampuPilot status="done" />
+                    <div className="min-w-0">
+                        <p className="truncate text-xs sm:text-sm font-black text-ink uppercase tracking-wide">
+                            {user?.nama ?? 'OPERATOR'}
+                        </p>
+                        <p className="truncate font-mono text-[10px] font-bold text-ink-2 uppercase">
+                            {user?.adalah_admin_area ? 'SEMUA AREA GUDANG' : `AREA: ${user?.area_operator ?? '-'}`}
+                        </p>
+                    </div>
                 </div>
 
-                <span className="shrink-0 border-x border-rule px-3 text-center">
-                    <span className="block font-mono text-base leading-none font-bold text-ink">
+                {/* Telemetri Total Counter Meter */}
+                <div className="shrink-0 flex items-center gap-1.5 border-2 border-ink bg-panel px-3 py-1 rounded-xs shadow-[1px_1px_0_0_#17150f]">
+                    <span className="font-mono text-base font-black text-ink leading-none">
                         {meta?.total ?? doList.length}
                     </span>
-                    <span className="block font-mono text-[10px] tracking-wide text-ink-2 uppercase">DO</span>
-                </span>
+                    <span className="font-mono text-[10px] font-black text-ink-2 uppercase tracking-wider">
+                        DO TOTAL
+                    </span>
+                </div>
 
-                <TombolKepala onClick={() => muatUlang(saring)} disabled={loadingAwal} aria-label="Segarkan daftar">
+                <TombolKepala
+                    onClick={() => {
+                        sensory.tap();
+                        muatUlang(saring);
+                    }}
+                    disabled={loadingAwal}
+                    aria-label="Segarkan daftar"
+                >
                     <RefreshCw className={loadingAwal ? 'animate-spin' : undefined} />
                 </TombolKepala>
                 <TombolKepala onClick={keluar} aria-label="Keluar">
@@ -160,7 +178,7 @@ export default function DoList() {
             />
 
             {error && (
-                <p className="flex shrink-0 items-center gap-2 border-l-4 border-honda bg-honda/8 px-3 py-2 text-sm text-honda">
+                <p className="flex shrink-0 items-center gap-2 border-l-4 border-honda bg-honda/10 px-3 py-2 text-xs font-bold text-honda shadow-2xs">
                     <AlertTriangle className="size-4 shrink-0" />
                     {error}
                 </p>
@@ -174,13 +192,17 @@ export default function DoList() {
                         ))}
                     </ul>
                 ) : doList.length === 0 ? (
-                    <div className="flex h-full flex-col items-center justify-center gap-2 px-6 text-center">
-                        <PackageCheck className="size-8 text-selesai" />
-                        <p className="font-semibold text-ink">
-                            {adaPenyaring ? 'Tidak ada DO yang cocok' : 'Semua DO sudah beres'}
+                    <div className="flex h-full flex-col items-center justify-center gap-2.5 px-6 text-center select-none">
+                        <div className="flex size-14 items-center justify-center rounded-xs border-2 border-ink bg-plate shadow-[2px_2px_0_0_#17150f]">
+                            <PackageCheck className="size-8 text-selesai" />
+                        </div>
+                        <p className="font-mono text-base font-black text-ink uppercase tracking-wider">
+                            {adaPenyaring ? 'TIDAK ADA DO YANG COCOK' : 'SEMUA ANTREAN SELESAI'}
                         </p>
-                        <p className="text-sm text-ink-2">
-                            {adaPenyaring ? 'Ubah atau reset penyaring.' : 'Tidak ada DO yang menunggu saat ini.'}
+                        <p className="font-mono text-xs text-ink-2 max-w-sm">
+                            {adaPenyaring
+                                ? 'Ubah kata kunci pencarian atau tekan tombol Reset.'
+                                : 'Tidak ada DO yang menunggu untuk area kerja Anda saat ini.'}
                         </p>
                     </div>
                 ) : (
@@ -200,11 +222,13 @@ export default function DoList() {
                         <div ref={sentinelRef} className="h-1" />
 
                         {loadingLanjut && (
-                            <p className="py-3 text-center font-mono text-xs text-ink-2">Memuat lagi…</p>
+                            <p className="py-3 text-center font-mono text-xs font-bold text-ink-2">
+                                Memuat antrean lanjutan...
+                            </p>
                         )}
                         {semuaSudahDimuat && (
-                            <p className="py-4 text-center font-mono text-[10px] tracking-wider text-ink-2 uppercase">
-                                Akhir daftar · {meta?.total} DO
+                            <p className="py-4 text-center font-mono text-[10px] font-bold tracking-widest text-ink-2 uppercase">
+                                AKHIR DAFTAR · {meta?.total} DOKUMEN DO
                             </p>
                         )}
                     </>

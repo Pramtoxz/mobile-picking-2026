@@ -6,6 +6,7 @@ import RedirectIfAuthed from '@/routes/RedirectIfAuthed';
 import RequireAuth from '@/routes/RequireAuth';
 import { useAuthStore } from '@/store/auth';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { Toaster } from 'sonner';
 
 function Beranda() {
     const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -30,6 +31,12 @@ export default function App() {
                     <Route path="/kerja/*" element={<WorkItem />} />
                 </Route>
             </Routes>
+            <Toaster
+                position="bottom-right"
+                toastOptions={{
+                    className: 'font-mono text-xs border-2 border-ink rounded-xs shadow-[2px_2px_0_0_#17150f]',
+                }}
+            />
         </BrowserRouter>
     );
 }

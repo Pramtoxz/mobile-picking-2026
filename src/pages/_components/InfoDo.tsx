@@ -1,5 +1,6 @@
 import { tanggalIndo } from '@/lib/format';
 import type { BarisPart } from '@/types';
+import { FileText } from 'lucide-react';
 
 const ItemInfo = ({ label, nilai }: { label: string; nilai: string }) => (
     <span className="flex items-center gap-1 text-[10px] font-mono">
@@ -9,6 +10,8 @@ const ItemInfo = ({ label, nilai }: { label: string; nilai: string }) => (
 );
 
 export default function InfoDo({ part }: { part: BarisPart }) {
+    const adaKeterangan = Boolean(part.keterangan_picking && part.keterangan_picking !== '-');
+
     return (
         <div className="flex shrink-0 items-center justify-between gap-x-3 border-b border-rule bg-plate/60 px-3 py-1 select-none overflow-x-auto">
             <div className="flex items-center gap-x-4 shrink-0">
@@ -17,6 +20,15 @@ export default function InfoDo({ part }: { part: BarisPart }) {
                 <ItemInfo label="Channel" nilai={part.nama_channel || '-'} />
                 <span className="text-rule">•</span>
                 <ItemInfo label="Dealer" nilai={part.fk_dealer || '-'} />
+                {adaKeterangan && (
+                    <>
+                        <span className="text-rule">•</span>
+                        <span className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded-xs bg-honda/15 border border-honda/40 text-[9px] font-mono font-bold text-honda uppercase tracking-wider">
+                            <FileText className="size-2.5 shrink-0" />
+                            Ada Catatan
+                        </span>
+                    </>
+                )}
             </div>
 
             <div className="shrink-0">
