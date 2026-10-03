@@ -49,6 +49,35 @@ export const authService = {
     }
   },
 
+  async loginWithCode(kode: string): Promise<boolean> {
+    try {
+      const response = await api.post("/lapangan/auth/login-kode", {
+        kode,
+      });
+
+      const { data }: LoginResponse = response.data;
+
+      if (!data || !data.token) {
+        throw new Error(response.data?.message || "Login gagal - token tidak diterima");
+      }
+
+      const user: UserLapangan = {
+        id: data.user.id,
+        email: data.user.email,
+        nama: data.user.nama,
+        area_operator: (data.user as any).area_operator ?? null,
+        adalah_admin_area: Boolean((data.user as any).adalah_admin_area),
+      };
+
+      useAuthStore.getState().setAuth(data.token, user);
+
+      return true;
+    } catch (error: unknown) {
+      console.error("Login dengan kode error:", error);
+      throw error;
+    }
+  },
+
   async logout(): Promise<void> {
     const token = useAuthStore.getState().token;
 

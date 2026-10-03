@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "Picking Lapangan - Mobile App for Warehouse Operators (HP Landscape)",
+  "description": "Operator Picking - Mobile App for Warehouse Operators (HP Landscape)",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",

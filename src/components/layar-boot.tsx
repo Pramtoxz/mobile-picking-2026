@@ -24,7 +24,7 @@ export default function LayarBoot({
               {keterangan}
             </p>
             <p className="font-mono text-[10px] text-ink-2">
-              Terminal Operasional Lapangan
+              Terminal Operator Picking
             </p>
           </div>
 

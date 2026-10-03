@@ -71,3 +71,60 @@ export interface ItemKartuStok {
     qty_part: number;
     jumlah_input?: number;
 }
+
+export interface BarisStoring {
+    fk_do: string;
+    tgl_kartu: string | null;
+    fk_gudang: string | null;
+    nm_gudang_part: string | null;
+    total_items: number;
+    done_items: number;
+    total_qty_diterima: number;
+    total_qty_masuk: number;
+    status_storing: 'Waiting' | 'Done';
+}
+
+export interface BarisPartStoring {
+    id: number;
+    fk_do: string;
+    no_part: string;
+    nm_part: string;
+    kode_rak: string;
+    area_rak: string | null;
+    no_doos: string | null;
+    qty_diterima: number;
+    qty_masuk: number | null;
+    status_masuk: boolean;
+    fk_gudang: string | null;
+    nm_gudang_part: string | null;
+    tgl_kartu: string | null;
+    waktu_done: string | null;
+}
+
+export interface DokumenStoringInfo {
+    fk_do: string;
+    fk_gudang: string | null;
+    nm_gudang_part: string | null;
+    tgl_kartu: string | null;
+    total_items: number;
+    done_items: number;
+}
+
+export interface SaringStoring {
+    area: string | null;
+    status: string | null;
+    tgl_dari: string | null;
+    tgl_sampai: string | null;
+    cari: string | null;
+    gudang: string | null;
+}
+
+export const saringStoringKosong = (): SaringStoring => ({
+    area: null,
+    status: null,
+    tgl_dari: null,
+    tgl_sampai: null,
+    cari: null,
+    gudang: null,
+});
+

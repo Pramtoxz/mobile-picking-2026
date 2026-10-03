@@ -1,18 +1,17 @@
 import { Layar, LayarIsi, LayarKepala, TombolKepala } from '@/components/layar';
 import LayarBoot from '@/components/layar-boot';
-import api from '@/lib/api';
+import { ModulSwitcher } from '@/components/modul-switcher';
 import { perluLayarBoot, tandaiSudahBoot } from '@/lib/boot';
 import { sensory } from '@/lib/sensory';
 import { authService } from '@/services/auth';
-import { saringKosong, type BarisDo, type MetaPaginasi, type SaringDo } from '@/types';
-
+import { storingService } from '@/services/storing';
+import { saringStoringKosong, type BarisStoring, type MetaPaginasi, type SaringStoring } from '@/types';
 import axios from 'axios';
-import { AlertTriangle, LogOut, PackageCheck, RefreshCw } from 'lucide-react';
+import { AlertTriangle, Boxes, LogOut, RefreshCw } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ModulSwitcher } from '@/components/modul-switcher';
-import BarisDoItem, { KepalaKolomDo } from './_components/BarisDoItem';
-import PenyaringDo from './_components/PenyaringDo';
+import BarisStoringItem, { KepalaKolomStoring } from './_components/BarisStoringItem';
+import PenyaringStoring from './_components/PenyaringStoring';
 
 function BarisKerangka() {
     return (
@@ -27,13 +26,11 @@ function BarisKerangka() {
     );
 }
 
-export default function DoList() {
+export default function StoringList() {
     const navigate = useNavigate();
-    const [doList, setDoList] = useState<BarisDo[]>([]);
-
+    const [storingList, setStoringList] = useState<BarisStoring[]>([]);
     const [meta, setMeta] = useState<MetaPaginasi | null>(null);
-    const [saring, setSaring] = useState<SaringDo>(saringKosong);
-    const [daftarAreaChannel, setDaftarAreaChannel] = useState<string[]>([]);
+    const [saring, setSaring] = useState<SaringStoring>(saringStoringKosong());
     const [loadingAwal, setLoadingAwal] = useState(true);
     const [loadingLanjut, setLoadingLanjut] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -41,35 +38,29 @@ export default function DoList() {
     const sentinelRef = useRef<HTMLDivElement>(null);
 
     const muatHalaman = useCallback(
-        async (halaman: number, saringDipakai: SaringDo) => {
-            const response = await api.get('/lapangan/do', {
-                params: { page: halaman, ...saringDipakai },
-            });
-            const data: BarisDo[] = response.data.data ?? [];
+        async (halaman: number, saringDipakai: SaringStoring) => {
+            const res = await storingService.daftar({ page: halaman, ...saringDipakai });
+            const data: BarisStoring[] = res.data ?? [];
 
-            setDoList((sebelumnya) => (halaman === 1 ? data : [...sebelumnya, ...data]));
-            setMeta(response.data.meta ?? null);
-
-            if (halaman === 1) {
-                setDaftarAreaChannel(response.data.daftar_area_channel ?? []);
-            }
+            setStoringList((sebelumnya) => (halaman === 1 ? data : [...sebelumnya, ...data]));
+            setMeta(res.meta ?? null);
         },
         [],
     );
 
     const muatUlang = useCallback(
-        async (saringDipakai: SaringDo) => {
+        async (saringDipakai: SaringStoring) => {
             setLoadingAwal(true);
             setError(null);
             try {
                 await muatHalaman(1, saringDipakai);
             } catch (err) {
-                console.error('Load error:', err);
+                console.error('Load error storing:', err);
                 if (axios.isAxiosError(err) && err.response?.status === 401) {
                     navigate('/login', { replace: true });
                     return;
                 }
-                setError('Gagal memuat data DO.');
+                setError('Gagal memuat data storing part.');
             } finally {
                 setLoadingAwal(false);
                 tandaiSudahBoot();
@@ -93,7 +84,7 @@ export default function DoList() {
         try {
             await muatHalaman(meta.current_page + 1, saring);
         } catch (err) {
-            console.error('Load more error:', err);
+            console.error('Load more storing error:', err);
         } finally {
             setLoadingLanjut(false);
         }
@@ -132,17 +123,14 @@ export default function DoList() {
     return (
         <Layar>
             <LayarKepala>
-                <div className="min-w-0 flex-1 flex items-center gap-2.5">
-                    <ModulSwitcher modulAktif="picking" />
-                </div>
+                <ModulSwitcher modulAktif="storing" />
 
-                {/* Telemetri Total Counter Meter */}
                 <div className="shrink-0 flex items-center gap-1.5 border-2 border-ink bg-panel px-3 py-1 rounded-xs shadow-[1px_1px_0_0_#17150f]">
                     <span className="font-mono text-base font-black text-ink leading-none">
-                        {meta?.total ?? doList.length}
+                        {meta?.total ?? storingList.length}
                     </span>
                     <span className="font-mono text-[10px] font-black text-ink-2 uppercase tracking-wider">
-                        DO TOTAL
+                        STORING TOTAL
                     </span>
                 </div>
 
@@ -152,7 +140,7 @@ export default function DoList() {
                         muatUlang(saring);
                     }}
                     disabled={loadingAwal}
-                    aria-label="Segarkan daftar"
+                    aria-label="Segarkan daftar storing"
                 >
                     <RefreshCw className={loadingAwal ? 'animate-spin' : undefined} />
                 </TombolKepala>
@@ -161,13 +149,11 @@ export default function DoList() {
                 </TombolKepala>
             </LayarKepala>
 
-
-            <PenyaringDo
+            <PenyaringStoring
                 saring={saring}
-                daftarAreaChannel={daftarAreaChannel}
                 adaPenyaring={adaPenyaring}
                 onUbah={(perubahan) => setSaring((s) => ({ ...s, ...perubahan }))}
-                onReset={() => setSaring(saringKosong())}
+                onReset={() => setSaring(saringStoringKosong())}
             />
 
             {error && (
@@ -184,30 +170,30 @@ export default function DoList() {
                             <BarisKerangka key={i} />
                         ))}
                     </ul>
-                ) : doList.length === 0 ? (
+                ) : storingList.length === 0 ? (
                     <div className="flex h-full flex-col items-center justify-center gap-2.5 px-6 text-center select-none">
                         <div className="flex size-14 items-center justify-center rounded-xs border-2 border-ink bg-plate shadow-[2px_2px_0_0_#17150f]">
-                            <PackageCheck className="size-8 text-selesai" />
+                            <Boxes className="size-8 text-selesai" />
                         </div>
                         <p className="font-mono text-base font-black text-ink uppercase tracking-wider">
-                            {adaPenyaring ? 'TIDAK ADA DO YANG COCOK' : 'SEMUA ANTREAN SELESAI'}
+                            {adaPenyaring ? 'TIDAK ADA STORING YANG COCOK' : 'SEMUA STORING SELESAI'}
                         </p>
                         <p className="font-mono text-xs text-ink-2 max-w-sm">
                             {adaPenyaring
                                 ? 'Ubah kata kunci pencarian atau tekan tombol Reset.'
-                                : 'Tidak ada DO yang menunggu untuk area kerja Anda saat ini.'}
+                                : 'Tidak ada dokumen penerimaan part masuk untuk area kerja Anda saat ini.'}
                         </p>
                     </div>
                 ) : (
                     <>
-                        <KepalaKolomDo />
+                        <KepalaKolomStoring />
                         <ul className="divide-y divide-rule">
-                            {doList.map((item, indeks) => (
-                                <BarisDoItem
+                            {storingList.map((item, indeks) => (
+                                <BarisStoringItem
                                     key={item.fk_do}
                                     item={item}
                                     nomor={indeks + 1}
-                                    onClick={() => navigate(`/kerja/${item.fk_do}`)}
+                                    onClick={() => navigate(`/storing/${item.fk_do}`)}
                                 />
                             ))}
                         </ul>
@@ -221,7 +207,7 @@ export default function DoList() {
                         )}
                         {semuaSudahDimuat && (
                             <p className="py-4 text-center font-mono text-[10px] font-bold tracking-widest text-ink-2 uppercase">
-                                AKHIR DAFTAR · {meta?.total} DOKUMEN DO
+                                AKHIR DAFTAR · {meta?.total} DOKUMEN STORING
                             </p>
                         )}
                     </>

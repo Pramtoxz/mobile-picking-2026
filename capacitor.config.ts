@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.menaraagung.picking',
-  appName: 'Picking Lapangan',
+  appName: 'Operator Picking',
   webDir: 'dist'
 };
 

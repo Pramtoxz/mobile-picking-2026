@@ -10,7 +10,7 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  base: "./", // Relative path untuk Capacitor (assets di-load dari file://)
+  base: "/",
   server: {
     host: true, // Memastikan bisa diakses dari IP lokal (192.168.137.1)
   },

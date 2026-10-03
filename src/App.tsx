@@ -1,6 +1,8 @@
 import { useGulirKeInput } from '@/hooks/use-gulir-ke-input';
 import DoList from '@/pages/DoList';
 import Login from '@/pages/Login';
+import StoringList from '@/pages/StoringList';
+import StoringWorkItem from '@/pages/StoringWorkItem';
 import WorkItem from '@/pages/WorkItem';
 import RedirectIfAuthed from '@/routes/RedirectIfAuthed';
 import RequireAuth from '@/routes/RequireAuth';
@@ -29,8 +31,11 @@ export default function App() {
                 <Route element={<RequireAuth />}>
                     <Route path="/do" element={<DoList />} />
                     <Route path="/kerja/*" element={<WorkItem />} />
+                    <Route path="/storing" element={<StoringList />} />
+                    <Route path="/storing/*" element={<StoringWorkItem />} />
                 </Route>
             </Routes>
+
             <Toaster
                 position="bottom-right"
                 toastOptions={{

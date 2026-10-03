@@ -1,4 +1,4 @@
-# Picking Lapangan (Mobile App)
+# Operator Picking (Mobile App)
 
 Aplikasi mobile untuk operator lapangan gudang — menjalankan picking part di rak area masing-masing.
 
@@ -15,7 +15,7 @@ npm install
 Copy `.env.example` ke `.env` dan sesuaikan URL backend:
 
 ```bash
-VITE_API_URL=https://picking.menara-agung.com/api  # Ganti dengan IP server @new
+VITE_API_URL=
 ```
 
 ### 3. Development
@@ -96,19 +96,6 @@ Setiap kali operator tekan "SUDAH DIAMBIL ✓":
 ---
 
 ## 🚧 Troubleshooting
-
-### Error "Cannot find module '@/components/ui/button'"
-
-Pastikan path alias di `tsconfig.json` dan `vite.config.ts` benar:
-
-```json
-{
-  "compilerOptions": {
-    "baseUrl": ".",
-    "paths": { "@/*": ["./src/*"] }
-  }
-}
-```
 
 ### Build error dengan Tailwind CSS v4
 

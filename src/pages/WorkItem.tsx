@@ -6,9 +6,10 @@ import { TombolMesin } from '@/components/tombol-mesin';
 import { Button } from '@/components/ui/button';
 import api from '@/lib/api';
 import { sensory } from '@/lib/sensory';
+import { authService } from '@/services/auth';
 import type { BarisPart, ItemKartuStok } from '@/types';
 import axios from 'axios';
-import { AlertTriangle, ArrowLeft, Check, Loader2, Lock, RotateCcw } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, Check, Loader2, Lock, LogOut, RefreshCw, RotateCcw } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import DaftarPart from './_components/DaftarPart';
@@ -154,6 +155,12 @@ export default function WorkItem() {
     const partSelesai = partTerpilih?.status_picking_list === 'done';
     const partTerkunci = partTerpilih?.status_picking_list === 'final';
 
+    const keluar = async () => {
+        sensory.tap();
+        await authService.logout();
+        navigate('/login', { replace: true });
+    };
+
     return (
         <Layar>
             <LayarKepala>
@@ -172,13 +179,27 @@ export default function WorkItem() {
                     </div>
                 </div>
 
-                <span className="shrink-0 border-l border-rule pl-3 text-right">
+                <span className="shrink-0 border-l border-rule px-2.5 text-right">
                     <span className="block font-mono text-base leading-none font-bold text-ink">
                         {selesai}
                         <span className="text-ink-2">/{parts.length}</span>
                     </span>
                     <span className="block font-mono text-[10px] text-ink-2">{persen}%</span>
                 </span>
+
+                <TombolKepala
+                    onClick={() => {
+                        sensory.tap();
+                        muatParts();
+                    }}
+                    disabled={memproses}
+                    aria-label="Segarkan data"
+                >
+                    <RefreshCw className={memproses ? 'animate-spin' : undefined} />
+                </TombolKepala>
+                <TombolKepala onClick={keluar} aria-label="Keluar">
+                    <LogOut />
+                </TombolKepala>
             </LayarKepala>
 
             {partTerpilih && <InfoDo part={partTerpilih} />}
